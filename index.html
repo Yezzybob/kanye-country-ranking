@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Kanye Country Ranking</title>
+</head>
+
+<body id="body" style="margin:0; font-family:Arial; background:pink; text-align:center;">
+
+<h1 id="title">🌍 Kanye West Country Ranking</h1>
+
+<!-- SETTINGS -->
+<div style="margin:10px;">
+  <button onclick="toggleMusic()">🎵 Mute/Unmute</button>
+
+  <input type="color" onchange="changeBg(this.value)">
+
+  <select onchange="changeLang(this.value)">
+    <option value="en">English</option>
+    <option value="pl">Polski</option>
+  </select>
+</div>
+
+<!-- COUNTRY SELECT -->
+<p id="selectText">Choose your country:</p>
+
+<select id="country" style="font-size:16px; padding:5px;"></select>
+
+<br><br>
+
+<button onclick="join()" style="padding:10px 20px; font-size:18px;">
+JOIN
+</button>
+
+<h2 id="rankTitle">🏆 Ranking</h2>
+
+<table style="margin:auto; background:white; width:60%; border-collapse:collapse;">
+  <thead>
+    <tr>
+      <th id="th1">Country</th>
+      <th id="th2">Fans</th>
+    </tr>
+  </thead>
+  <tbody id="table"></tbody>
+</table>
+
+<!-- MUSIC -->
+<iframe id="music"
+width="0" height="0"
+src="https://www.youtube.com/embed/8kyWDhB_QeI?autoplay=1&loop=1"
+allow="autoplay">
+</iframe>
+
+<script>
+
+// countries
+const countries = [
+  "Poland 🇵🇱","USA 🇺🇸","Germany 🇩🇪","France 🇫🇷","UK 🇬🇧",
+  "Japan 🇯🇵","Brazil 🇧🇷","Canada 🇨🇦","Italy 🇮🇹","Spain 🇪🇸"
+];
+
+let data = JSON.parse(localStorage.getItem("kanye")) || {};
+let muted = false;
+let lang = "en";
+
+// fill dropdown
+let select = document.getElementById("country");
+countries.forEach(c=>{
+  let opt = document.createElement("option");
+  opt.innerText = c;
+  select.appendChild(opt);
+});
+
+// JOIN
+function join(){
+  let c = select.value;
+
+  if(!data[c]) data[c]=0;
+
+  if(data[c] < 1e12){
+    data[c]++;
+  }
+
+  localStorage.setItem("kanye", JSON.stringify(data));
+  update();
+}
+
+// UPDATE TABLE
+function update(){
+  let table = document.getElementById("table");
+  table.innerHTML = "";
+
+  let sorted = Object.entries(data).sort((a,b)=>b[1]-a[1]);
+
+  sorted.forEach(([c,v])=>{
+    table.innerHTML += `
+      <tr>
+        <td>${c}</td>
+        <td>${v}</td>
+      </tr>
+    `;
+  });
+}
+
+// MUSIC
+function toggleMusic(){
+  let m = document.getElementById("music");
+  muted = !muted;
+  m.style.display = muted ? "none" : "block";
+}
+
+// BACKGROUND
+function changeBg(color){
+  document.body.style.background = color;
+}
+
+// LANGUAGE SWITCH
+function changeLang(l){
+  lang = l;
+
+  if(lang === "pl"){
+    document.getElementById("title").innerText = "🌍 Ranking krajów Kanye Westa";
+    document.getElementById("selectText").innerText = "Wybierz kraj:";
+    document.getElementById("rankTitle").innerText = "🏆 Ranking";
+    document.getElementById("th1").innerText = "Kraj";
+    document.getElementById("th2").innerText = "Fani";
+  }
+
+  if(lang === "en"){
+    document.getElementById("title").innerText = "🌍 Kanye West Country Ranking";
+    document.getElementById("selectText").innerText = "Choose your country:";
+    document.getElementById("rankTitle").innerText = "🏆 Ranking";
+    document.getElementById("th1").innerText = "Country";
+    document.getElementById("th2").innerText = "Fans";
+  }
+}
+
+update();
+</script>
+
+</body>
+</html>
